@@ -38,8 +38,8 @@ async def drive(drive: Drive):
     access_token = drive.access_token
 
     user_path = f"./videos/drive-{user}"
-    # projectroot/videos 配下に drive-{user名}/{crypto,normal} のディレクトリを作る
-    subprocess.run(f"mkdir -p {user_path}/crypto {user_path}/normal", shell=True)
+    # projectroot/videos 配下に drive-{user名}/{encrypted,normal} のディレクトリを作る
+    subprocess.run(f"mkdir -p {user_path}/encrypted {user_path}/normal", shell=True)
 
     # yt-dlp アップデート
     subprocess.run(["yt-dlp", "-U"])
@@ -55,7 +55,7 @@ async def drive(drive: Drive):
     keys = []
     for target in normal_files:
         target_path = dl_path + "/" + target
-        output_path = user_path + "/crypto/encrypt-" + target
+        output_path = user_path + "/encrypted/encrypted-" + target
         key, iv = aes.gen()
         aes.encrypt(
             target_path,
@@ -63,25 +63,25 @@ async def drive(drive: Drive):
             key,
             iv,
         )
-        keys.append({f"{target}": {"key": key.hex()}})
+        keys.append({f"encrypted-{target}" : {"key" : key.hex()}})
 
     print(keys)
 
     # google drive にアップロード
-    crypto_path = user_path + "/crypto"
-    crypto_files = os.listdir(crypto_path)
-    for target in crypto_files:
+    encrypted_path = user_path + "/encrypted"
+    encrypted_files = os.listdir(encrypted_path)
+    for target in encrypted_files:
         up_drive.upload_to_google_drive(
-            video_path=crypto_path + "/" + target,
-            target_name=target,
-            drive_folder_id=drive_folder_id,
-            access_token=access_token,
+            video_path      = encrypted_path + "/" + target,
+            target_name     = target,
+            drive_folder_id = drive_folder_id,
+            access_token    = access_token,
         )
 
     # user_pathフォルダを削除
     subprocess.run(["rm", "-rf", user_path])
 
-    return {"key": f"{keys}"}
+    return keys
 
 
 if __name__ == "__main__":
