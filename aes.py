@@ -16,7 +16,7 @@ def gen():
     return key, iv
 
 
-def encrypt(target_path, output_path, key, iv):
+def encrypt(target_path, output_path, key, iv) -> None:
 
     # 動画ファイルの読み込み
     with open(target_path, "rb") as f_input:
