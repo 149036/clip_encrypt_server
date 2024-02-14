@@ -63,7 +63,7 @@ async def drive(drive: Drive):
             key,
             iv,
         )
-        keys.append({f"encrypted-{target}" : {"key" : key.hex()}})
+        keys.append({f"encrypted-{target}": {"key": key.hex()}})
 
     print(keys)
 
@@ -72,10 +72,10 @@ async def drive(drive: Drive):
     encrypted_files = os.listdir(encrypted_path)
     for target in encrypted_files:
         up_drive.upload_to_google_drive(
-            video_path      = encrypted_path + "/" + target,
-            target_name     = target,
-            drive_folder_id = drive_folder_id,
-            access_token    = access_token,
+            video_path=encrypted_path + "/" + target,
+            target_name=target,
+            drive_folder_id=drive_folder_id,
+            access_token=access_token,
         )
 
     # user_pathフォルダを削除
