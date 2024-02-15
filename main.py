@@ -3,8 +3,10 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
+import configparser
 
 import aes, up_drive
+
 
 app = FastAPI()
 
@@ -18,7 +20,6 @@ app.add_middleware(
 
 
 class Drive(BaseModel):
-    user: str
     drive_folder_id: str
     video_url: str
     access_token: str
@@ -31,22 +32,30 @@ async def root():
 
 @app.post("/drive/")
 async def drive(drive: Drive):
+    # config.ini
+    config_ini = configparser.ConfigParser()
+    config_ini.read("config.ini", encoding="utf-8")
 
-    user = drive.user
     drive_folder_id = drive.drive_folder_id
     video_url = drive.video_url
     access_token = drive.access_token
+    user_path = f"./videos/drive-{os.urandom(32).hex()}"
 
-    user_path = f"./videos/drive-{user}"
     # projectroot/videos 配下に drive-{user名}/{encrypted,normal} のディレクトリを作る
-    subprocess.run(f"mkdir -p {user_path}/encrypted {user_path}/normal", shell=True)
+    cmd = f"mkdir -p {user_path}/encrypted {user_path}/normal"
+    subprocess.run(cmd.split(), check=False)
 
     # yt-dlp アップデート
-    subprocess.run(["yt-dlp", "-U"])
+    cmd = "yt-dlp -U"
+    subprocess.run(cmd.split(), check=False)
 
-    dl_path = user_path + "/normal"
     # 動画を dl_path配下に ダウンロード
-    subprocess.run(["yt-dlp", "--paths", dl_path, video_url])
+    dl_path = user_path + "/normal"
+    cmd = f"yt-dlp --paths {dl_path} {video_url}"
+    # tor ture
+    if int(config_ini.get("DEFAULT", "tor")):
+        cmd += " --proxy socks5://127.0.0.1:9050"
+    subprocess.run(cmd.split(), check=False)
 
     # dl_path配下のファイル一覧のリスト [a.mp4,...]
     normal_files = os.listdir(dl_path)
@@ -57,12 +66,7 @@ async def drive(drive: Drive):
         target_path = dl_path + "/" + target
         output_path = user_path + "/encrypted/encrypted-" + target
         key, iv = aes.gen()
-        aes.encrypt(
-            target_path,
-            output_path,
-            key,
-            iv,
-        )
+        aes.encrypt(target_path, output_path, key, iv)
         keys.append({f"encrypted-{target}": {"key": key.hex()}})
 
     print(keys)
@@ -79,10 +83,12 @@ async def drive(drive: Drive):
         )
 
     # user_pathフォルダを削除
-    subprocess.run(["rm", "-rf", user_path])
+    cmd = f"rm -rf {user_path}"
+    subprocess.run(cmd.split(), check=False)
 
     return keys
 
 
 if __name__ == "__main__":
+
     uvicorn.run(app, host="0.0.0.0", port=7999, log_level="debug")
