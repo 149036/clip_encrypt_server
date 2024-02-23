@@ -5,10 +5,7 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import configparser
 
-
 app = FastAPI()
-
-origins = ["https://localhost:7999"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,11 +21,9 @@ class Drive(BaseModel):
     video_url: str
     access_token: str
 
-
 @app.get("/")
 async def root():
     return {"message": "hello"}
-
 
 @app.post("/drive")
 async def drive(drive: Drive):
@@ -42,13 +37,16 @@ async def drive(drive: Drive):
     user_path = f"./videos/drive-{os.urandom(4).hex()}"
 
     # projectroot/videos 配下に drive-{user名}/{encrypted,normal} のディレクトリを作る
+    print(f"mkdir : {user_path}/encrypted")
+    print(f"mkdir : {user_path}/normal")
     cmd = f"mkdir -p {user_path}/encrypted {user_path}/normal"
     subprocess.run(
         cmd.split(),
         check=True,
     )
-
+    
     # yt-dlp アップデート
+    print("yt-dlp : update")
     cmd = "yt-dlp -U"
     subprocess.run(
         cmd.split(),
@@ -56,22 +54,30 @@ async def drive(drive: Drive):
     )
 
     # 動画を dl_path配下に ダウンロード
+    print("yt-dlp : download : start")
     dl_path = user_path + "/normal"
     cmd = f"yt-dlp --paths {dl_path} {video_url} --id"
     # tor ture
     if int(config_ini.get("DEFAULT", "tor")):
+        print("tor : true")
+        print("tor : start")
         tor = subprocess.Popen(["tor"])
         cmd += " --proxy socks5://127.0.0.1:9050"
 
+    
     subprocess.run(cmd.split(), check=False)
-
+    print("yt-dlp : download : end")
+    
     if int(config_ini.get("DEFAULT", "tor")):
+        print("tor : end")
         tor.kill()
 
     # dl_path配下のファイル一覧のリスト [a.mp4,...]
     normal_files = os.listdir(dl_path)
 
-    # 暗号化
+    
+    # normal/* のファイルすべて暗号化
+    print("encrypt : start")
     for target in normal_files:
         target_path = dl_path + "/" + target
         output_path = user_path + "/encrypted/encrypted-" + target
@@ -94,6 +100,7 @@ async def drive(drive: Drive):
             ],
             check=True,
         )
+        
         # キャシュの開放
         cmd = "echo 1 | sudo tee /proc/sys/vm/drop_caches"
         subprocess.run(
@@ -102,24 +109,31 @@ async def drive(drive: Drive):
             capture_output=True,
             check=True,
         )
+        
         print(f"encrypted : {target}")
-
-    # google drive にアップロード
+    print("encrypt : end")
+    
+    # google drive に　encrypted/* のファイルすべてアップロード
+    print("upload")
     encrypted_path = user_path + "/encrypted"
     encrypted_files = os.listdir(encrypted_path)
     for target in encrypted_files:
+
+        # metadata.json 生成
+        print(f"gen_metadata : start")
         metadata = f"{user_path}/metadata.json"
         with open(metadata, "w") as f:
             param = {
-                "name": target,
+                "name": target, 
                 "mimeType": "video/mp4",
                 "parents": [drive_folder_id],
             }
             f.write(json.dumps(param))
         target_path = encrypted_path + "/" + target
+        print(f"gen_metadata : end")
 
-        print(f"accesstoken : {access_token}")
-
+        # upload
+        print("upload : start")
         subprocess.run(
             [
                 "curl",
@@ -135,12 +149,16 @@ async def drive(drive: Drive):
             ],
             check=True,
         )
+        print("upload : end")
+        print(f"uploaded :{target}")
 
+    
     # user_pathフォルダを削除
     # cmd = f"rm -rf {user_path}"
-    # subprocess.run(cmd.split(), check=False)
+    # subprocess.run(cmd.split(), check=True)
+    # print(f"removed : {user_path}")
 
-    return {"message": "complete"}
+    return {"message": "finish"}
 
 
 if __name__ == "__main__":
