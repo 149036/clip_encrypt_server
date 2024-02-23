@@ -1,7 +1,8 @@
-0.クライアントから google folder id と 動画の url を受け取る
-1.yt-dlp で動画をダウンロード 2.動画を暗号化
-3.google drive にアップ
-する API サーバー
+0.クライアントから google folder id と video url と access token を受け取る  
+1.yt-dlp で動画をダウンロード  
+2.動画を暗号化  
+3.google drive にアップ  
+する API サーバー  
 
 ### 使用ツール
 
