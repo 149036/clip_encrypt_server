@@ -149,9 +149,18 @@ async def drive(drive: Drive):
             ],
             check=True,
         )
-        print("upload : end")
+        
+        # キャシュの開放
+        cmd = "echo 1 | sudo tee /proc/sys/vm/drop_caches"
+        subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            check=True,
+        )
+        
         print(f"uploaded :{target}")
-
+    print("upload : end")
     
     # user_pathフォルダを削除
     # cmd = f"rm -rf {user_path}"
