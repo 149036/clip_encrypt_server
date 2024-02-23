@@ -6,7 +6,7 @@
 ### 使用ツール
 
 yt-dlp  
-tor
+tor(option)
 
 ### 使い方
 
@@ -21,12 +21,8 @@ $ pip install -r requirements.txt
 $ python3 main.py
 ```
 
-tor を使う場合は立ち上げておく
-
-```sh
-$ tor
-```
-
 ### roadmap  
 並列ダウンロード(tor)  
-ストリーム暗号
+ストリーム暗号  
+メモリ足りない　　
+
