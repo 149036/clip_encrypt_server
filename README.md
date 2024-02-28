@@ -11,15 +11,24 @@ tor(option)
 
 ### 使い方
 
-linux
+### linux
 
 ```sh
-$ git clone https://github.com/149036/dl-crypt-drive-server.git
-$ cd dl-crypt-drive-server
-$ python3 -m venv venv
-$ source venv/bin/active
-$ pip install -r requirements.txt
-$ python3 main.py
+git clone https://github.com/149036/dl-crypt-drive-server.git
+cd dl-crypt-drive-server
+python3 -m venv venv
+source venv/bin/active
+pip install -r requirements.txt
+python3 main.py
+```
+daemon  
+```
+gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:7999
+```
+daemon-kill  
+```
+ps aux | grep gunicorn
+kill xxxx
 ```
 
 ### roadmap  
