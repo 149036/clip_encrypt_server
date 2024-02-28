@@ -88,9 +88,9 @@ async def drive(drive: Drive):
     )
 
     # user_pathフォルダを削除
-    # cmd = f"rm -rf {user_path}"
-    # subprocess.run(cmd.split(), check=True)
-    # print(f"removed : {user_path}")
+    cmd = f"rm -rf {user_path}"
+    subprocess.run(cmd.split(), check=True)
+    print(f"removed : {user_path}")
 
     return {"message": "finish"}
 
