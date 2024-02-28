@@ -7,7 +7,7 @@ import configparser
 
 from src import yt_dlp
 from src import up_drive
-from src import _crypt
+from src import encrypt
 
 app = FastAPI()
 
@@ -74,7 +74,7 @@ async def drive(drive: Drive):
     normal_files = os.listdir(dl_path)
 
     # normal/* のファイルすべて暗号化
-    _crypt.aes_256_cbc(
+    encrypt.aes_256_cbc(
         normal_files=normal_files,
         dl_path=dl_path,
         user_path=user_path,
