@@ -1,12 +1,13 @@
-0.クライアントから google folder id と video url と access token を受け取る  
-1.yt-dlp で動画をダウンロード  
-2.動画を暗号化  
-3.google drive にアップ  
-する API サーバー  
+#
 
-### 使用ツール
+0.クライアントから google folder id と video url と access token を受け取る
+1.yt-dlp で動画をダウンロード 2.動画を暗号化
+3.google drive にアップ
+する API サーバー
 
-yt-dlp  
+## 使用ツール
+
+yt-dlp
 tor(option)
 
 ### 使い方
@@ -21,18 +22,22 @@ source venv/bin/active
 pip install -r requirements.txt
 python3 main.py
 ```
-daemon  
-```
+
+daemon
+
+```sh
 gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:7999
 ```
-daemon-kill  
-```
+
+daemon kill
+
+```sh
 ps aux | grep gunicorn
 kill xxxx
 ```
 
-### roadmap  
-並列ダウンロード(tor)  
-ストリーム暗号  
-メモリ足りない　　
+### roadmap
 
+並列ダウンロード(tor)
+ストリーム暗号
+メモリ足りない
