@@ -14,10 +14,13 @@ class Valid:
 
     def run(self, drive_folder_id, video_url, access_token):
         if not self.hasValue(drive_folder_id):
+            print('error : drive_folder_id is ""')
             return False
         if not self.hasValue(video_url):
+            print('error : video_url is ""')
             return False
         if not self.hasValue(access_token):
+            print('error : access_token is ""')
             return False
         if not self.checkPermission(drive_folder_id, access_token):
             return False
@@ -27,7 +30,6 @@ class Valid:
     # 値が 空文字(初期値) の場合 False
     def hasValue(self, value: str) -> bool:
         if value == "":
-            print('value is ""')
             return False
         return True
 
