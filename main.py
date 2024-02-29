@@ -60,6 +60,8 @@ async def drive(model: Model):
 
         # 動画を dl_path配下に ダウンロード
         # config.ini, [DEFAULT] tor=1 なら tor を使う
+        # video_url が無効の場合 error
+        # dl 失敗で error
         if not yt_dlp.dl(
             user_path=user_path,
             video_url=video_url,
