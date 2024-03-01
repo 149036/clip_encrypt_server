@@ -7,7 +7,7 @@
 
 ## 使用ツール
 
-yt-dlp
+yt-dlp  
 tor(option)
 
 ### 使い方
