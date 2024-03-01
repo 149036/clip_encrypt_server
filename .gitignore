@@ -1,4 +1,8 @@
 venv
-*.ipynb
-__pycache__
 videos
+
+*.ipynb
+
+__pycache__
+
+.vscode
