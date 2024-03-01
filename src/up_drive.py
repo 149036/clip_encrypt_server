@@ -1,7 +1,8 @@
-from importlib import metadata
 import json
 import os
 import subprocess
+import mimetypes
+
 from src import clear
 
 
@@ -15,11 +16,15 @@ def up(
     encrypted_path = user_path + "/encrypted"
     encrypted_files = os.listdir(encrypted_path)
     for target in encrypted_files:
+        target_path = encrypted_path + "/" + target
 
         # metadata.json 生成
-        metadata_path = gen_metadata(user_path, target, drive_folder_id)
-
-        target_path = encrypted_path + "/" + target
+        metadata_path = gen_metadata(
+            user_path,
+            target,
+            target_path,
+            drive_folder_id,
+        )
 
         # upload
         print("upload : start")
@@ -49,6 +54,7 @@ def up(
 def gen_metadata(
     user_path,
     target,
+    target_path,
     drive_folder_id,
 ):
     # metadata.json 生成
@@ -57,7 +63,8 @@ def gen_metadata(
     with open(metadata_path, "w") as f:
         param = {
             "name": target,
-            "mimeType": "video/mp4",
+            # "mimeType": "video/mp4",
+            "mimeType": mimetypes.guess_type(target_path)[0],
             "parents": [drive_folder_id],
         }
         f.write(json.dumps(param))
