@@ -10,14 +10,16 @@ def up(
     user_path,
     drive_folder_id,
     access_token,
+    up_target_path,
 ):
-    # google drive にencrypted/* のファイルすべてアップロード
-    print("upload")
-    encrypted_path = user_path + "/encrypted"
-    encrypted_files = os.listdir(encrypted_path)
-    for target in encrypted_files:
-        target_path = encrypted_path + "/" + target
+    # google drive にtarget/* のファイルすべてアップロード
 
+    # ["file1","file2"...]
+    targets = os.listdir(up_target_path)
+
+    for target in targets:
+        target_path = up_target_path + "/" + target
+        print(f"target_path : {target_path}")
         # metadata.json 生成
         metadata_path = gen_metadata(
             user_path,
@@ -63,7 +65,6 @@ def gen_metadata(
     with open(metadata_path, "w") as f:
         param = {
             "name": target,
-            # "mimeType": "video/mp4",
             "mimeType": mimetypes.guess_type(target_path)[0],
             "parents": [drive_folder_id],
         }

@@ -8,8 +8,17 @@ import configparser
 from src import yt_dlp
 from src import up_drive
 from src import encrypt
-from src import valid
 from src import clear
+
+
+class Model(BaseModel):
+    drive_folder_id: str
+    video_url: str
+    access_token: str
+
+
+from src import valid
+
 
 app = FastAPI()
 
@@ -20,12 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class Model(BaseModel):
-    drive_folder_id: str
-    video_url: str
-    access_token: str
 
 
 @app.get("/")
@@ -50,10 +53,9 @@ async def drive(model: Model):
 
         user_path = f"./videos/drive-{os.urandom(4).hex()}"
 
-        # projectroot/videos 配下に drive-{user名}/{encrypted,normal} のディレクトリを作る
-        print(f"mkdir : {user_path}/encrypted")
+        # projectroot/videos/drive-{user名}/normal ディレクトリを作る
         print(f"mkdir : {user_path}/normal")
-        cmd = f"mkdir -p {user_path}/encrypted {user_path}/normal"
+        cmd = f"mkdir -p {user_path}/normal"
         subprocess.run(cmd.split(), check=True)
 
         # yt-dlp アップデート
@@ -75,18 +77,28 @@ async def drive(model: Model):
         dl_path = user_path + "/normal"
         normal_files = os.listdir(dl_path)
 
-        # normal/* のファイルすべて暗号化
-        encrypt.aes_256_cbc(
-            normal_files=normal_files,
-            dl_path=dl_path,
-            user_path=user_path,
-        )
+        if int(config_ini.get("DEFAULT", "encrypt")):
+            # projectroot/videos/drive-{user名}/encrypted ディレクトリを作る
+            print(f"mkdir : {user_path}/encrypted")
+            cmd = f"mkdir -p {user_path}/encrypted"
+            subprocess.run(cmd.split(), check=True)
+
+            # normal/* のファイルすべて暗号化
+            encrypt.aes_256_cbc(
+                normal_files=normal_files,
+                dl_path=dl_path,
+                user_path=user_path,
+            )
+            up_target_path = user_path + "/encrypted"
+        else:
+            up_target_path = user_path + "/normal"
 
         # google drive にencrypted/* のファイルすべてアップロード
         up_drive.up(
             user_path=user_path,
             drive_folder_id=drive_folder_id,
             access_token=access_token,
+            up_target_path=up_target_path,
         )
 
         # user_pathフォルダを削除
@@ -94,10 +106,10 @@ async def drive(model: Model):
         subprocess.run(cmd.split(), check=True)
         print(f"removed : {user_path}")
 
-        clear.cache()
-
         return_msg = {"message": "finish"}
 
+    # キャッシュクリア
+    clear.cache()
     return return_msg
 
 

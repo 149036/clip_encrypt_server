@@ -20,13 +20,14 @@ cd dl-crypt-drive-server
 python3 -m venv venv
 source venv/bin/active
 pip install -r requirements.txt
+
 python3 main.py
 ```
 
-daemon
+gunicorn daemon
 
 ```sh
-gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:7999 --daemon
+gunicorn main:app --workers 4 --threads 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:7999 --daemon
 ```
 
 daemon kill
