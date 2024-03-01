@@ -1,6 +1,7 @@
 # yt-dlp アップデート
 import subprocess
 
+from src import clear
 
 
 def update():
@@ -44,5 +45,8 @@ def dl(
     if int(config_ini.get("DEFAULT", "tor")):
         print("tor : end")
         tor.kill()
+
+    # キャシュの開放
+    clear.cache()
 
     return True

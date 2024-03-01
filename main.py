@@ -9,6 +9,7 @@ from src import yt_dlp
 from src import up_drive
 from src import encrypt
 from src import valid
+from src import clear
 
 app = FastAPI()
 
@@ -92,6 +93,8 @@ async def drive(model: Model):
         cmd = f"rm -rf {user_path}"
         subprocess.run(cmd.split(), check=True)
         print(f"removed : {user_path}")
+
+        clear.cache()
 
         return_msg = {"message": "finish"}
 

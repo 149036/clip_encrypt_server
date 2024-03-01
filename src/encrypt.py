@@ -1,4 +1,5 @@
 import subprocess
+from src import clear
 
 
 def aes_256_cbc(
@@ -31,13 +32,7 @@ def aes_256_cbc(
         )
 
         # キャシュの開放
-        cmd = "echo 1 | sudo tee /proc/sys/vm/drop_caches"
-        subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            check=True,
-        )
+        clear.cache()
 
         print(f"encrypted : {target}")
     print("encrypt : end")

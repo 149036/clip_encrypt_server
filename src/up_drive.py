@@ -1,6 +1,8 @@
+from importlib import metadata
 import json
 import os
 import subprocess
+from src import clear
 
 
 def up(
@@ -15,17 +17,9 @@ def up(
     for target in encrypted_files:
 
         # metadata.json 生成
-        print("gen_metadata : start")
-        metadata = f"{user_path}/metadata.json"
-        with open(metadata, "w") as f:
-            param = {
-                "name": target,
-                "mimeType": "video/mp4",
-                "parents": [drive_folder_id],
-            }
-            f.write(json.dumps(param))
+        metadata_path = gen_metadata(user_path, target, drive_folder_id)
+
         target_path = encrypted_path + "/" + target
-        print("gen_metadata : end")
 
         # upload
         print("upload : start")
@@ -37,7 +31,7 @@ def up(
                 "-H",
                 f"Authorization: Bearer {access_token}",
                 "-F",
-                f"data=@{metadata};type=application/json;charset=UTF-8",
+                f"data=@{metadata_path};type=application/json;charset=UTF-8",
                 "-F",
                 f"file=@{target_path};type=text/plain",
                 "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
@@ -46,13 +40,26 @@ def up(
         )
 
         # キャシュの開放
-        cmd = "echo 1 | sudo tee /proc/sys/vm/drop_caches"
-        subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            check=True,
-        )
+        clear.cache()
 
         print(f"uploaded :{target}")
     print("upload : end")
+
+
+def gen_metadata(
+    user_path,
+    target,
+    drive_folder_id,
+):
+    # metadata.json 生成
+    print("gen_metadata : start")
+    metadata_path = f"{user_path}/metadata.json"
+    with open(metadata_path, "w") as f:
+        param = {
+            "name": target,
+            "mimeType": "video/mp4",
+            "parents": [drive_folder_id],
+        }
+        f.write(json.dumps(param))
+    print("gen_metadata : end")
+    return metadata_path
