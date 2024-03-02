@@ -17,9 +17,9 @@ tor(option)
 ```sh
 git clone https://github.com/149036/dl-crypt-drive-server.git
 cd dl-crypt-drive-server
-python3 -m venv venv
-source venv/bin/active
-pip install -r requirements.txt
+
+chmod +x setup.sh
+./setup.sh
 
 chmod +x run.sh
 ./run.sh
