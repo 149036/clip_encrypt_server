@@ -1,22 +1,16 @@
-import os, subprocess
-from pydantic import BaseModel
-from fastapi import FastAPI
-import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
+import os
+import subprocess
 import configparser
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+
+from src import model
 from src import yt_dlp
 from src import up_drive
 from src import encrypt
 from src import clear
-
-
-class Model(BaseModel):
-    drive_folder_id: str
-    video_url: str
-    access_token: str
-
-
 from src import valid
 
 
@@ -37,7 +31,7 @@ async def root():
 
 
 @app.post("/drive")
-async def drive(model: Model):
+async def drive(model: model.Model):
     check = valid.Valid(model)
 
     if not check.result:
@@ -46,6 +40,7 @@ async def drive(model: Model):
         drive_folder_id = model.drive_folder_id
         video_url = model.video_url
         access_token = model.access_token
+        encryption = model.encryption
 
         # config.iniを読み込む
         config_ini = configparser.ConfigParser()
@@ -71,13 +66,21 @@ async def drive(model: Model):
             config_ini=config_ini,
         ):
             return_msg = {"message": "error"}
+
+            # user_pathフォルダを削除
+            cmd = f"rm -rf {user_path}"
+            subprocess.run(cmd.split(), check=True)
+            print(f"removed : {user_path}")
+
+            clear.cache()
+
             return return_msg
 
         # dl_path配下のファイル一覧のリスト [a.mp4,...]
         dl_path = user_path + "/normal"
         normal_files = os.listdir(dl_path)
 
-        if int(config_ini.get("DEFAULT", "encrypt")):
+        if encryption:
             # projectroot/videos/drive-{user名}/encrypted ディレクトリを作る
             print(f"mkdir : {user_path}/encrypted")
             cmd = f"mkdir -p {user_path}/encrypted"

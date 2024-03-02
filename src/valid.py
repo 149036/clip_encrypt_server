@@ -1,18 +1,37 @@
 import requests
-from main import Model
+from src import model
 
 
 class Valid:
-    def __init__(self, model: Model):
+    def __init__(self, model: model.Model):
+        """バリデート
+
+        Args:
+            model (model.Model): _description_
+        """
         print("Valid : start")
-        self.result = self.run(
-            model.drive_folder_id,
-            model.video_url,
-            model.access_token,
-        )
+        self.result = self.run(model.drive_folder_id, model.video_url, model.access_token, model.encryption)
         print("Valid : end")
 
-    def run(self, drive_folder_id, video_url, access_token):
+    def run(
+        self,
+        drive_folder_id,
+        video_url,
+        access_token,
+        encryption,
+    ):
+        """実行する関数
+
+        Args:
+            drive_folder_id (str)
+            video_url (str)
+            access_token (str)
+            encrypt (bool)
+
+        Returns:
+            bool: 正しい値ならば True
+        """
+
         if not self.hasValue(drive_folder_id):
             print('error : drive_folder_id is ""')
             return False
@@ -22,6 +41,10 @@ class Valid:
         if not self.hasValue(access_token):
             print('error : access_token is ""')
             return False
+        if not self.hasValue(encryption):
+            print('error : encryption is ""')
+            return False
+
         if not self.checkPermission(drive_folder_id, access_token):
             return False
 
