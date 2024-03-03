@@ -1,3 +1,4 @@
+import subprocess
 import requests
 from src import model
 
@@ -44,8 +45,9 @@ class Valid:
         if not self.hasValue(encryption):
             print('error : encryption is ""')
             return False
-
         if not self.checkPermission(drive_folder_id, access_token):
+            return False
+        if not self.is_downloadable(video_url):
             return False
 
         return True
@@ -68,5 +70,14 @@ class Valid:
         if "error" in [i for i in data]:
             print("Error : ")
             print(data)
+            return False
+        return True
+
+    def is_downloadable(self, video_url):
+        cmd = f"yt-dlp {video_url} --simulate --skip-download --verbose --id"
+        res = subprocess.run(cmd.split())
+        if res.returncode != 0:
+            print("Error : video is not downloadable")
+
             return False
         return True
