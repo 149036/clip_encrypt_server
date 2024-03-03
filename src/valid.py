@@ -20,7 +20,7 @@ class Valid:
         video_url,
         access_token,
         encryption,
-    ):
+    ) -> bool:
         """実行する関数
 
         Args:
