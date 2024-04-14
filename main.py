@@ -46,10 +46,8 @@ async def drive(model: model.Model):
         config_ini = configparser.ConfigParser()
         config_ini.read("config.ini", encoding="utf-8")
 
-        user_path = f"./videos/drive-{os.urandom(4).hex()}"
-
         # projectroot/videos/drive-{user名}/normal ディレクトリを作る
-        print(f"mkdir : {user_path}/normal")
+        user_path = f"./videos/drive-{os.urandom(4).hex()}"
         cmd = f"mkdir -p {user_path}/normal"
         subprocess.run(cmd.split(), check=True)
 
@@ -70,7 +68,6 @@ async def drive(model: model.Model):
             # user_pathフォルダを削除
             cmd = f"rm -rf {user_path}"
             subprocess.run(cmd.split(), check=True)
-            print(f"removed : {user_path}")
 
             clear.cache()
 
@@ -80,21 +77,22 @@ async def drive(model: model.Model):
         dl_path = user_path + "/normal"
         normal_files = os.listdir(dl_path)
 
-        if encryption:
+        # 暗号化するかどうか
+        if not encryption:
+            up_target_path = user_path + "/normal"
+        else:
             # projectroot/videos/drive-{user名}/encrypted ディレクトリを作る
-            print(f"mkdir : {user_path}/encrypted")
             cmd = f"mkdir -p {user_path}/encrypted"
             subprocess.run(cmd.split(), check=True)
 
             # normal/* のファイルすべて暗号化
-            encrypt.aes_256_cbc(
+            pass_list = encrypt.aes_256_cbc(
                 normal_files=normal_files,
                 dl_path=dl_path,
                 user_path=user_path,
             )
+
             up_target_path = user_path + "/encrypted"
-        else:
-            up_target_path = user_path + "/normal"
 
         # google drive にencrypted/* のファイルすべてアップロード
         up_drive.up(
@@ -109,7 +107,7 @@ async def drive(model: model.Model):
         subprocess.run(cmd.split(), check=True)
         print(f"removed : {user_path}")
 
-        return_msg = {"message": "finish"}
+        return_msg = pass_list
 
     # キャッシュクリア
     clear.cache()
