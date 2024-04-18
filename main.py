@@ -90,6 +90,7 @@ async def drive(model: model.Model):
                 normal_files=normal_files,
                 dl_path=dl_path,
                 user_path=user_path,
+                config_ini=config_ini,
             )
 
             up_target_path = user_path + "/encrypted"
