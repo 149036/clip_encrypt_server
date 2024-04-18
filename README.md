@@ -9,7 +9,7 @@
 ## 使用ツール
 
 yt-dlp  
-openssl  
+openssl(libressl)  
 tor(option)
 
 ### 使い方
