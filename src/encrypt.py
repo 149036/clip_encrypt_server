@@ -1,6 +1,6 @@
+from base64 import b64encode
 import os
 import subprocess
-import configparser
 from src import clear
 
 
@@ -8,10 +8,9 @@ def aes_256_cbc(
     normal_files,
     dl_path,
     user_path,
+    config_ini,
 ):
     print("encrypt : start")
-    config_ini = configparser.ConfigParser()
-    config_ini.read("../config.ini", encoding="utf-8")
     openssl = config_ini.get("DEFAULT", "openssl")
     pass_list = {}
 
@@ -69,7 +68,9 @@ def aes_256_cbc(
                 ],
                 check=True,
             )
-            pass_list["encrypted-" + target] = {"key": key, "iv": iv}
+            b64_key = b64encode(key_bytes).decode()
+            b64_iv = b64encode(iv_bytes).decode()
+            pass_list["encrypted-" + target] = {"key": b64_key, "iv": b64_iv}
 
         # キャシュの開放
         clear.cache()
