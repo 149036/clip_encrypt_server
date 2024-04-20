@@ -10,7 +10,6 @@ def aes_256_cbc(
     user_path,
     config_ini,
 ):
-    print("encrypt : start")
     openssl = config_ini.get("DEFAULT", "openssl")
     pass_list = {}
 
@@ -18,11 +17,8 @@ def aes_256_cbc(
         target_path = dl_path + "/" + target
         output_path = user_path + "/encrypted/encrypted-" + target
 
-        password = os.urandom(32).hex()
-
-        openssl = "libressl"
-
-        if "openssl" == openssl:
+        if openssl == "openssl":
+            password = os.urandom(32).hex()
             subprocess.run(
                 [
                     "openssl",
@@ -43,11 +39,16 @@ def aes_256_cbc(
             )
             pass_list["encrypted-" + target] = password
 
-        elif "libressl" == openssl:
+        elif openssl == "libressl":
             key_bytes = os.urandom(32)
             iv_bytes = os.urandom(16)
+
+            b64_key = b64encode(key_bytes).decode()
+            b64_iv = b64encode(iv_bytes).decode()
+
             key = key_bytes.hex()
             iv = iv_bytes.hex()
+
             subprocess.run(
                 [
                     "openssl",
@@ -68,14 +69,8 @@ def aes_256_cbc(
                 ],
                 check=True,
             )
-            b64_key = b64encode(key_bytes).decode()
-            b64_iv = b64encode(iv_bytes).decode()
             pass_list["encrypted-" + target] = {"key": b64_key, "iv": b64_iv}
 
-        # キャシュの開放
         clear.cache()
 
-        print(f"encrypted : {target}")
-    print(pass_list)
-    print("encrypt : end")
     return pass_list
