@@ -32,7 +32,7 @@ async def root():
     return response.Message.error
 
 
-@app.post("/drive")
+@app.post("/drive/")
 async def drive(model: model.Model):
     check = valid.Valid(model)
 
