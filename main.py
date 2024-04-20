@@ -6,6 +6,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
+
+from src import response
 from src import model
 from src import yt_dlp
 from src import up_drive
@@ -27,7 +29,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "hello"}
+    return response.Message.error
 
 
 @app.post("/drive")
@@ -35,7 +37,7 @@ async def drive(model: model.Model):
     check = valid.Valid(model)
 
     if not check.result:
-        return_msg = {"messge": "error"}
+        return_msg = response.Message.error
     else:
         drive_folder_id = model.drive_folder_id
         video_url = model.video_url
@@ -63,7 +65,6 @@ async def drive(model: model.Model):
             video_url=video_url,
             config_ini=config_ini,
         ):
-            return_msg = {"message": "error"}
 
             # user_pathフォルダを削除
             cmd = f"rm -rf {user_path}"
@@ -71,7 +72,7 @@ async def drive(model: model.Model):
 
             clear.cache()
 
-            return return_msg
+            return response.Message.error
 
         # dl_path配下のファイル一覧のリスト [a.mp4,...]
         dl_path = user_path + "/normal"
