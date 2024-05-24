@@ -1,20 +1,12 @@
+import configparser
 import os
 import subprocess
-import configparser
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 
-
-from src import response
-from src import model
-from src import yt_dlp
-from src import up_drive
-from src import encrypt
-from src import clear
-from src import valid
-
+from src import clear, encrypt, model, response, up_drive, valid, yt_dlp
 
 app = FastAPI()
 
