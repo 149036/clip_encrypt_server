@@ -57,7 +57,6 @@ async def drive(model: model.Model):
             video_url=video_url,
             config_ini=config_ini,
         ):
-
             # user_pathフォルダを削除
             cmd = f"rm -rf {user_path}"
             subprocess.run(cmd.split(), check=True)
@@ -109,5 +108,4 @@ async def drive(model: model.Model):
 
 
 if __name__ == "__main__":
-
     uvicorn.run(app, host="0.0.0.0", port=7999, log_level="debug")

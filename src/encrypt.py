@@ -1,6 +1,7 @@
-from base64 import b64encode
 import os
 import subprocess
+from base64 import b64encode
+
 from src import clear
 
 
@@ -43,33 +44,27 @@ def aes_256_cbc(
             key_bytes = os.urandom(32)
             iv_bytes = os.urandom(16)
 
-            b64_key = b64encode(key_bytes).decode()
-            b64_iv = b64encode(iv_bytes).decode()
+            key_b64 = b64encode(key_bytes).decode()
+            iv_b64 = b64encode(iv_bytes).decode()
 
-            key = key_bytes.hex()
-            iv = iv_bytes.hex()
+            key_hex = key_bytes.hex()
+            iv_hex = iv_bytes.hex()
 
-            subprocess.run(
-                [
-                    "openssl",
-                    "enc",
-                    "-e",
-                    "-aes-256-cbc",
-                    "-base64",
-                    "-nosalt",
-                    "-p",
-                    "-K",
-                    key,
-                    "-iv",
-                    iv,
-                    "-in",
-                    target_path,
-                    "-out",
-                    output_path,
-                ],
-                check=True,
-            )
-            pass_list["encrypted-" + target] = {"key": b64_key, "iv": b64_iv}
+            cmd = f"""
+                    openssl
+                    enc
+                    -e
+                    -aes-256-cbc
+                    -nosalt
+                    -p
+                    -K {key_hex}
+                    -iv {iv_hex}
+                    -in {target_path}
+                    -out {output_path}
+                    """
+
+            subprocess.run(cmd.split(), check=True)
+            pass_list["encrypted-" + target] = {"key": key_b64, "iv": iv_b64}
 
         clear.cache()
 

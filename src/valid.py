@@ -1,6 +1,8 @@
 import subprocess
 from typing import Optional
+
 import requests
+
 from src import model
 
 
@@ -12,7 +14,9 @@ class Valid:
             model (model.Model): _description_
         """
         print("Valid : start")
-        self.result = self.__run(model.drive_folder_id, model.video_url, model.access_token, model.encryption)
+        self.result = self.__run(
+            model.drive_folder_id, model.video_url, model.access_token, model.encryption
+        )
         print("Valid : end")
 
     def __run(
@@ -76,8 +80,18 @@ class Valid:
         return True
 
     def __is_downloadable(self, video_url):
-        cmd = f"yt-dlp {video_url} --simulate --skip-download --verbose --id"
-        res = subprocess.run(cmd.split())
+        cmd = f"""
+            yt-dlp {video_url}
+            --simulate
+            --skip-download
+            --verbose
+            --id
+            --no-check-certificates
+        """
+        # "--check-formats", #--check-all-formats # Make sure formats are selected only from those that are actually downloadable
+        # "-F", #-F, --list-formats # List available formats of each video. Simulate unless --no-simulate is used
+
+        res = subprocess.run(cmd.split(),check=True)
         if res.returncode != 0:
             print("Error : video is not downloadable")
 
