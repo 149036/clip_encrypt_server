@@ -16,7 +16,7 @@ def aes_256_cbc(
 
     for target in normal_files:
         target_path = dl_path + "/" + target
-        output_path = user_path + "/encrypted/encrypted-" + target
+        output_path = user_path + "/encrypted/" + target + ".enc"
 
         if openssl == "openssl":
             password = os.urandom(32).hex()
@@ -38,7 +38,7 @@ def aes_256_cbc(
                 ],
                 check=True,
             )
-            pass_list["encrypted-" + target] = password
+            pass_list[target + ".enc"] = password
 
         elif openssl == "libressl":
             key_bytes = os.urandom(32)
@@ -64,7 +64,7 @@ def aes_256_cbc(
                     """
 
             subprocess.run(cmd.split(), check=True)
-            pass_list["encrypted-" + target] = {"key": key_b64, "iv": iv_b64}
+            pass_list[target + ".enc"] = {"key": key_b64, "iv": iv_b64}
 
         clear.cache()
 

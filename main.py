@@ -95,10 +95,11 @@ async def drive(model: model.Model):
             up_target_path=up_target_path,
         )
 
-        # user_pathフォルダを削除
-        cmd = f"rm -rf {user_path}"
-        subprocess.run(cmd.split(), check=True)
-        print(f"removed : {user_path}")
+        if config_ini.get("DEBUG", "debug") != "true":
+            # user_pathフォルダを削除
+            cmd = f"rm -rf {user_path}"
+            subprocess.run(cmd.split(), check=True)
+            print(f"removed : {user_path}")
 
         return_msg = pass_list
 

@@ -71,12 +71,31 @@ class Valid:
     # drive_folder が 共有の場合
     # 共有されている & 編集可 の場合 True
     def __checkPermission(self, drive_folder_id, access_token):
+        # url = f"https://www.googleapis.com/drive/v3/files/{drive_folder_id}/permissions?access_token={access_token}"
+        # data = requests.get(url).json()
+        # if "error" in [i for i in data]:
+        #     print("Error : ")
+        #     print(data)
+        #     return False
+        # return True
         url = f"https://www.googleapis.com/drive/v3/files/{drive_folder_id}/permissions?access_token={access_token}"
-        data = requests.get(url).json()
-        if "error" in [i for i in data]:
-            print("Error : ")
-            print(data)
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            print(f"Error: Received status code {response.status_code}")
             return False
+
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error: Response is not valid JSON")
+            print(response.text)
+            return False
+
+        if "error" in data:
+            print("Error:", data)
+            return False
+
         return True
 
     def __is_downloadable(self, video_url):
@@ -91,7 +110,7 @@ class Valid:
         # "--check-formats", #--check-all-formats # Make sure formats are selected only from those that are actually downloadable
         # "-F", #-F, --list-formats # List available formats of each video. Simulate unless --no-simulate is used
 
-        res = subprocess.run(cmd.split(),check=True)
+        res = subprocess.run(cmd.split(), check=True)
         if res.returncode != 0:
             print("Error : video is not downloadable")
 

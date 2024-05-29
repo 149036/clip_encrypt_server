@@ -18,22 +18,25 @@ def dl(
     # 動画を dl_path配下に ダウンロード
     print("yt-dlp : download : start")
     dl_path = user_path + "/normal"
+    limit_rate = "100M"
+    concurrent_fragments = 4
 
     #### yt-dlp command
-    flat_playlist = 1
-    limit_rate = 100
-    concurrent_fragments = 1
     cmd = f"""
         yt-dlp
-        {video_url}
         --paths {dl_path}
         --id
-        --flat-playlist {flat_playlist}
-        --limit-rate {limit_rate}M
+        --limit-rate {limit_rate}
         --concurrent-fragments {concurrent_fragments}
+        {video_url}
     """
+
+    is_flat_list = True
+    if is_flat_list:
+        cmd += " --flat-playlist"
+    # --throttled-rate RATE # Minimum download rate in bytes per second below which throttling is assumed and the video data is re-extracted, e.g. 100K
     # -r, --limit-rate RATE # Maximum download rate in bytes per second, e.g. 50K or 4.2M
-    # (default (--no-flat-playlist)) Do not extract the videos of a playlist, only list them
+    # --flat-playlist (default (--no-flat-playlist)) Do not extract the videos of a playlist, only list them
     # -N, --concurrent-fragments N #   Number of fragments of a dash/hlsnative video that should be downloaded concurrently (default is 1)
     # f"--max-downloads {NUMBER}", # Abort after downloading NUMBER files
 
