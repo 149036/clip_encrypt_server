@@ -1,6 +1,6 @@
 .venv
 videos
-
+dev
 *.ipynb
 
 __pycache__

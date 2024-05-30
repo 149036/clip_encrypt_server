@@ -35,6 +35,7 @@ async def drive(model: model.Model):
         video_url = model.video_url
         access_token = model.access_token
         encryption = model.encryption
+        crypt_algo = model.crypt_algo
 
         # config.iniを読み込む
         config_ini = configparser.ConfigParser()

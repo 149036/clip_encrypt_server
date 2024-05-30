@@ -6,3 +6,4 @@ class Model(BaseModel):
     video_url: str
     access_token: str
     encryption: bool
+    crypt_algo: str

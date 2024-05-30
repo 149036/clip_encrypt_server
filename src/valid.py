@@ -14,6 +14,7 @@ class Valid:
             model (model.Model): _description_
         """
         print("Valid : start")
+        print(model)
         self.result = self.__run(
             model.drive_folder_id, model.video_url, model.access_token, model.encryption
         )
