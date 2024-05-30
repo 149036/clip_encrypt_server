@@ -63,6 +63,8 @@ class Valid:
     def __hasValue(self, targets) -> Optional[str]:
         if "" in targets:
             return None
+        if "null" in targets:
+            return None
         return "ok"
 
     # フォルダのパーミッションを確認する
